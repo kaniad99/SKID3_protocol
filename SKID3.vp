@@ -1,0 +1,40 @@
+attacker[active]
+
+principal Alice[
+    knows private k
+    knows public A
+    generates ra
+]
+
+Alice -> Bob: ra
+
+principal Bob[
+    knows private k
+    knows public B
+    generates rb
+
+    sb = MAC(k,HASH(ra,rb,B))
+]
+
+Bob -> Alice: rb, sb
+
+principal Alice[
+    _ = ASSERT(MAC(k, HASH(ra,rb,B)), sb)?
+
+    ha = MAC(k, HASH(rb,A))
+]
+
+Alice -> Bob: ha
+
+principal Bob[
+    db = HASH(rb,A)
+    _ = ASSERT(MAC(k, db), ha)?
+]
+
+
+queries[
+    authentication? Bob -> Alice: sb
+    authentication? Alice -> Bob: ha
+	authentication? Alice -> Bob: ra
+	authentication? Bob -> Alice: rb
+]
